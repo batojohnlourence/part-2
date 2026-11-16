@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Borrowing History - School Equipment Borrowing System</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.css">
+</head>
+<body>
+  <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-hidden="true" tabindex="-1">
+  <label for="menu-toggle" class="menu-backdrop"></label>
+
+
+  <!-- =====================================================
+       BORROWING HISTORY PAGE
+       Sidebar + top bar are the same on every page.
+       If nobody is logged in, js/common.js sends the visitor back to index.html.
+       ===================================================== -->
+  <div id="app" class="app">
+
+    <!-- Sidebar navigation (left): each button opens another page -->
+    <aside id="sidebar" class="sidebar">
+      <label for="menu-toggle" class="sidebar-close" role="button" aria-label="Close menu">✖</label>
+      <img src="download.png" alt="logo">
+      <span>School Inventory System</span>
+
+      <!-- data-roles says which account types can see each link -->
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-link" data-page="dashboard" data-roles="admin custodian" onclick="showPage('dashboard')">📊 <span>Dashboard</span></button>
+        <button type="button" class="nav-link" data-page="equipment" data-roles="admin custodian" onclick="showPage('equipment')">📦 <span>Equipment</span></button>
+        <button type="button" class="nav-link" data-page="users" data-roles="admin custodian" onclick="showPage('users')">👥 <span>Users</span></button>
+        <button type="button" class="nav-link" data-page="requests" data-roles="admin custodian" onclick="showPage('requests')">📝 <span>Requests</span></button>
+        <button type="button" class="nav-link" data-page="history" data-roles="admin custodian" onclick="showPage('history')">📜 <span>Borrowing History</span></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="nav-link" onclick="logout()">🚪 <span>Log Out</span></button>
+      </div>
+    </aside>
+
+    <!-- Right side: top bar + page content -->
+    <div class="main">
+      <header class="topbar glass">
+        <label for="menu-toggle" id="menu-button" class="menu-button" role="button" aria-label="Open menu">☰</label>
+        <h2 id="page-title">Borrowing History</h2>
+        <div class="topbar-user">
+          <span id="user-name">User</span>
+          <span id="user-role" class="badge badge-active">Role</span>
+        </div>
+      </header>
+
+      <div class="content">
+
+        <section id="page-history" class="page">
+          <div class="toolbar glass">
+            <input type="search" id="history-search" placeholder="🔍 Search history..." oninput="renderHistory()">
+            <select id="history-status-filter" onchange="renderHistory()">
+              <option value="all">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Borrowed">Borrowed</option>
+              <option value="Returned">Returned</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+          </div>
+          <section class="panel glass">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Borrower</th><th>User ID</th><th>Equipment</th><th>Qty</th><th>Borrowing Date</th><th>Expected Return</th><th>Actual Return</th><th>Status</th></tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       POPUPS (MODALS) used on this page
+       ===================================================== -->
+
+  <!-- A user's borrowing history -->
+  <div id="user-history-modal" class="modal-overlay hidden" onclick="closeModalOnBackdrop(event, 'user-history-modal')">
+    <div class="modal-box modal-wide glass">
+      <div class="modal-header"><h3 id="user-history-title">Borrowing History</h3><button type="button" class="close-button" onclick="closeModal('user-history-modal')">✖</button></div>
+      <div id="user-history-body"></div>
+    </div>
+  </div>
+
+  <!-- Small message that appears at the bottom of the screen -->
+  <div id="toast" class="toast"></div>
+
+  <script src="../BackEnd/common.js"></script>
+  <script src="../BackEnd/history.js"></script>
+</body>
+</html>

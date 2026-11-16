@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+  <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-hidden="true" tabindex="-1">
+  <label for="menu-toggle" class="menu-backdrop"></label>
+
+    <div class="dashboard-card">
+        <aside>
+      <label for="menu-toggle" class="sidebar-close" role="button" aria-label="Close menu">✖</label>
+            <img src="download.png" alt="logo">
+            <h1>School Inventory System</h1>
+            <nav class="sidebar-nav">
+                <button type="button" class="nav-link" data-page="dashboard" data-roles="admin custodian" onclick="showPage('dashboard')">📊 <span>Dashboard</span></button>
+                <button type="button" class="nav-link" data-page="equipment" data-roles="admin custodian" onclick="showPage('equipment')">📦 <span>Equipment</span></button>
+                <button type="button" class="nav-link" data-page="users" data-roles="admin custodian" onclick="showPage('users')">👥 <span>Users</span></button>
+                <button type="button" class="nav-link" data-page="requests" data-roles="admin custodian" onclick="showPage('requests')">📝 <span>Requests</span></button>
+                <button type="button" class="nav-link" data-page="history" data-roles="admin custodian" onclick="showPage('history')">📜 <span>Borrowing History</span></button>
+            </nav>
+            <div class="sidebar-footer">
+                <button type="button" class="nav-link" onclick="logout()">🚪 <span>Log Out</span></button>
+            </div>
+        </aside>
+        <div class="main">
+            <header class="topbar glass">
+                <label for="menu-toggle" id="menu-button" class="menu-button" role="button" aria-label="Open menu">☰</label>
+                <h2 id="page-title">Dashboard</h2>
+                <div class="topbar-user">
+                <span id="user-name">User</span>
+                <span id="user-role" class="badge badge-active">Role</span>
+                </div>
+            </header>
+            <div class="content">
+
+        <section id="page-dashboard" class="page">
+          <div class="stats-grid">
+            <article class="stat-card glass"><div class="stat-icon">📦</div><div><p>Total Equipment</p><h3 id="stat-total">0</h3></div></article>
+            <article class="stat-card glass"><div class="stat-icon green">✅</div><div><p>Available Equipment</p><h3 id="stat-available">0</h3></div></article>
+            <article class="stat-card glass"><div class="stat-icon orange">📤</div><div><p>Borrowed Equipment</p><h3 id="stat-borrowed">0</h3></div></article>
+            <article class="stat-card glass"><div class="stat-icon">🎓</div><div><p>Total Students</p><h3 id="stat-students">0</h3></div></article>
+            <article class="stat-card glass"><div class="stat-icon">👩‍🏫</div><div><p>Total Teachers</p><h3 id="stat-teachers">0</h3></div></article>
+            <article class="stat-card glass"><div class="stat-icon red">⏳</div><div><p>Pending Requests</p><h3 id="stat-pending">0</h3></div></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel glass">
+              <h3>Recent Borrowing Activities</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Borrower</th><th>Equipment</th><th>Qty</th><th>Date</th><th>Status</th></tr></thead>
+                  <tbody id="recent-activities-body"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel glass">
+              <h3>Pending Borrowing Requests</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Borrower</th><th>Equipment</th><th>Qty</th><th>Actions</th></tr></thead>
+                  <tbody id="dashboard-pending-body"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel glass">
+              <h3>Recently Added Equipment</h3>
+              <ul id="recent-equipment-list" class="simple-list"></ul>
+            </section>
+
+            <section class="panel glass">
+              <h3>Equipment Availability Overview</h3>
+              <div id="availability-overview"></div>
+            </section>
+          </div>
+        </section>
+
+      </div>
+        </div>
+    </div>
+    <script src="../BackEnd/common.js"></script>
+    <script src="../BackEnd/dashboard.js"></script>
+</body>
+</html>

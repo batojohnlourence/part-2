@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-hidden="true" tabindex="-1">
+  <label for="menu-toggle" class="menu-backdrop"></label>
+
+    <div class="dashboard-card">
+        <aside>
+      <label for="menu-toggle" class="sidebar-close" role="button" aria-label="Close menu">✖</label>
+            <img src="download.png" alt="logo">
+            <h1>School Inventory System</h1>
+            <nav class="sidebar-nav">
+                <button type="button" class="nav-link" data-page="dashboard" data-roles="admin custodian" onclick="showPage('dashboard')">📊 <span>Dashboard</span></button>
+                <button type="button" class="nav-link" data-page="equipment" data-roles="admin custodian" onclick="showPage('equipment')">📦 <span>Equipment</span></button>
+                <button type="button" class="nav-link" data-page="users" data-roles="admin custodian" onclick="showPage('users')">👥 <span>Users</span></button>
+                <button type="button" class="nav-link" data-page="requests" data-roles="admin custodian" onclick="showPage('requests')">📝 <span>Requests</span></button>
+                <button type="button" class="nav-link" data-page="history" data-roles="admin custodian" onclick="showPage('history')">📜 <span>Borrowing History</span></button>
+            </nav>
+            <div class="sidebar-footer">
+                <button type="button" class="nav-link" onclick="logout()">🚪 <span>Log Out</span></button>
+            </div>
+        </aside>
+        <div class="main">
+            <header class="topbar glass">
+                <label for="menu-toggle" id="menu-button" class="menu-button" role="button" aria-label="Open menu">☰</label>
+                <h2 id="page-title">Equipment Management</h2>
+                <div class="topbar-user">
+                <span id="user-name">User</span>
+                <span id="user-role" class="badge badge-active">Role</span>
+                </div>
+            </header>
+            <div class="content">
+
+                <section id="page-equipment" class="page">
+                <div class="toolbar glass">
+                    <input type="search" id="equipment-search" placeholder="🔍 Search equipment..." oninput="renderEquipment()">
+                    <select id="equipment-category-filter" onchange="renderEquipment()"></select>
+                    <select id="equipment-view-filter" onchange="renderEquipment()">
+                    <option value="all">Show All</option>
+                    <option value="available">Available Only</option>
+                    <option value="borrowed">Currently Borrowed</option>
+                    </select>
+                    <button type="button" class="btn btn-primary" onclick="openAddEquipment()">➕ Add Equipment</button>
+                </div>
+                <div id="equipment-grid" class="equipment-grid"></div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+    <div id="equipment-form-modal" class="modal-overlay hidden" onclick="closeModalOnBackdrop(event, 'equipment-form-modal')">
+    <div class="modal-box glass">
+      <div class="modal-header"><h3 id="equipment-form-title">Add New Equipment</h3><button type="button" class="close-button" onclick="closeModal('equipment-form-modal')">✖</button></div>
+      <form id="equipment-form" class="form-grid" onsubmit="saveEquipment(event)">
+        <input type="hidden" id="equipment-record-id">
+        <div><label for="equipment-category">Category</label><select id="equipment-category" onchange="updateNameSuggestions()"></select></div>
+        <div><label for="equipment-name">Equipment Name</label>
+          <input type="text" id="equipment-name" list="equipment-name-options" placeholder="e.g. Basketball" required>
+          <datalist id="equipment-name-options"></datalist></div>
+        <div><label for="equipment-total">Total Quantity</label><input type="number" id="equipment-total" min="0" value="1" required></div>
+        <div><label for="equipment-location">Storage Location</label><input type="text" id="equipment-location" placeholder="e.g. Gym Storage" required></div>
+        <div><label for="equipment-condition">Condition</label>
+          <select id="equipment-condition"><option>Good</option><option>Fair</option><option>Needs Repair</option></select></div>
+        <div><label for="equipment-image-url">Image URL (optional)</label><input type="url" id="equipment-image-url" placeholder="https://..."></div>
+        <p class="full-width hint-text">If you leave the image empty, the category icon is used.</p>
+        <div class="full-width modal-actions">
+          <button type="button" class="btn" onclick="closeModal('equipment-form-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Equipment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Equipment details (opens when a card is clicked) -->
+  <div id="equipment-details-modal" class="modal-overlay hidden" onclick="closeModalOnBackdrop(event, 'equipment-details-modal')">
+    <div class="modal-box glass">
+      <div class="modal-header"><h3>Equipment Details</h3><button type="button" class="close-button" onclick="closeModal('equipment-details-modal')">✖</button></div>
+      <div id="equipment-details-body"></div>
+    </div>
+  </div>
+
+  <!-- Borrowing form (the borrower fills it in and signs) -->
+  <div id="borrow-form-modal" class="modal-overlay hidden" onclick="closeModalOnBackdrop(event, 'borrow-form-modal')">
+    <div class="modal-box glass">
+      <div class="modal-header"><h3>Borrowing Request Form</h3><button type="button" class="close-button" onclick="closeModal('borrow-form-modal')">✖</button></div>
+      <form id="borrow-form" class="form-grid" onsubmit="submitBorrowRequest(event)">
+        <input type="hidden" id="borrow-equipment-id">
+        <div><label for="borrow-name">Full Name</label><input type="text" id="borrow-name" required></div>
+        <div><label for="borrow-idnumber">Student Number / Employee ID</label>
+          <input type="text" id="borrow-idnumber" oninput="fillBorrowerFromId()" required>
+          <small id="borrow-lookup-hint" class="hint-text"></small></div>
+        <div><label for="borrow-type">User Type</label>
+          <select id="borrow-type"><option value="student">Student</option><option value="teacher">Teacher</option></select></div>
+        <div><label for="borrow-department">Department / Grade Level</label><input type="text" id="borrow-department" required></div>
+        <div><label for="borrow-email">Email Address</label><input type="email" id="borrow-email" required></div>
+        <div><label for="borrow-contact">Contact Number</label><input type="text" id="borrow-contact" required></div>
+        <div><label for="borrow-equipment-name">Equipment Name</label><input type="text" id="borrow-equipment-name" readonly></div>
+        <div><label for="borrow-quantity">Quantity to Borrow</label><input type="number" id="borrow-quantity" min="1" value="1" required>
+          <small id="borrow-available-hint" class="hint-text"></small></div>
+        <div class="full-width"><label for="borrow-purpose">Purpose of Borrowing</label><input type="text" id="borrow-purpose" placeholder="Why do you need this equipment?" required></div>
+        <div><label for="borrow-date">Date Borrowed</label><input type="date" id="borrow-date" readonly tabindex="-1" style="pointer-events:none;background:#eef2f7;">
+          <small class="hint-text">Set automatically to today.</small></div>
+        <div><label for="borrow-return-date">Return Deadline</label><input type="date" id="borrow-return-date" readonly tabindex="-1" style="pointer-events:none;background:#eef2f7;">
+          <small id="borrow-return-hint" class="hint-text"></small></div>
+        <div class="full-width"><label for="borrow-notes">Additional Notes</label><textarea id="borrow-notes" rows="2" placeholder="Optional"></textarea></div>
+
+        <!-- Signature pad: the borrower signs here with a mouse, finger or stylus -->
+        <div class="full-width signature-section">
+          <label for="signature-canvas">Borrower's Signature</label>
+          <p class="hint-text">I confirm that the information above is correct. I will take good care of the equipment and return it on the expected date.</p>
+          <canvas id="signature-canvas" width="560" height="170"></canvas>
+          <div class="signature-actions">
+            <span class="hint-text">Sign inside the box.</span>
+            <button type="button" class="btn btn-small" onclick="clearSignature()">Clear signature</button>
+          </div>
+        </div>
+
+        <div class="full-width modal-actions">
+          <button type="button" class="btn" onclick="closeModal('borrow-form-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">SUBMIT REQUEST</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Small message that appears at the bottom of the screen -->
+  <div id="toast" class="toast"></div>
+  <script src="../BackEnd/common.js"></script>
+  <script src="../BackEnd/equipment.js"></script>
+</body>
+</html>
